@@ -1,18 +1,21 @@
 ---
-title: グローバルショートカットのリスニング
+title: ショートカットのリスニング
 lang: ja-jp
 slug: shortcuts
 order: 8
 ---
 
 <div class="section-content">
-[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)は、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。`shortcut()` メソッドを使って、グローバルショートカットのイベントをリスニングすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
+`shortcut()` メソッドは、[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)と[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)の両方をサポートします。
+
+ショートカットは、テキスト入力エリアや検索バーから起動できる Slack クライアント内の UI エレメントです。グローバルショートカットは、コンポーザーメニューまたは検索メニューから呼び出すことができます。メッセージショートカットは、メッセージのコンテキストメニュー内にあります。`shortcut()` メソッドを使って、これらのショートカットのイベントをリスニングすることができます。このメソッドには `callback_id` を文字列または正規表現のデータ型で設定します。
 
 グローバルショートカットのイベントは Slack へイベントを受信したことを知らせるために `ack()` メソッドで確認する必要があります。
 
-グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](#creating-modals)などの用途に使用できる `trigger_id` を含んでいます。グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを使用できます。
+グローバルショートカットのペイロードは、ユーザーの実行アクションの確認のために[モーダルを開く](#creating-modals)などの用途に使用できる `trigger_id` を含んでいます。
 
-⚠️ [メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)は引き続き[`action()` メソッド](#action-listening)を使用するので注意してください。**Bolt の次のメジャーバージョンからはグローバルショートカットもメッセージショートカットも両方とも `shortcut()` メソッドを使用します。**
+⚠️ グローバルショートカットのペイロードは **チャンネル ID は含んでいない** ことに注意してください。もしあなたのアプリがチャンネル ID を知る必要があれば、モーダル内で [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを使用できます。
+メッセージショートカットのペイロードはチャンネル ID を含みます。
 </div>
 
 ```javascript
@@ -20,6 +23,7 @@ order: 8
 app.shortcut('open_modal', async ({ payload, ack, context }) => {
   // グローバルショートカットリクエストの確認
   ack();
+
   try {
     // 組み込みの WebClient を使って views.open API メソッドを呼び出す
     const result = await app.client.views.open({
@@ -56,6 +60,7 @@ app.shortcut('open_modal', async ({ payload, ack, context }) => {
         ]
       }
     });
+
     console.log(result);
   }
   catch (error) {
